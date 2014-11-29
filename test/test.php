@@ -10,3 +10,4 @@ $ts = new TestSuite();
 
 $ts->addFile('test_suites/InputWrapper.test.php');
 $ts->addFile('test_suites/InputParser.test.php');
+$ts->addFile('test_suites/HotelFinder.test.php');

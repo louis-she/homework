@@ -42,7 +42,10 @@ class InputParser extends AppHotelRes implements InputParserInterface
      */
     public function getCustomerType()
     {
-        $content = $this->getContent();
+        if (!$content = $this->getContent()) {
+            return false;
+        }
+
         if (!preg_match('/\s*(Regular|Bridgewood):/', $content, $matches)
             || !isset($matches[1])) {
             $error = self::ERR_INPUT_CUSTOMERTYPE;
@@ -60,7 +63,10 @@ class InputParser extends AppHotelRes implements InputParserInterface
      */
     public function getCustomerDates()
     {
-        $content = $this->getContent();
+        if (!$content = $this->getContent()) {
+            return false;
+        }
+
         if (!preg_match_all('/\((\w+)\)/', $content, $matches) 
             || !isset($matches[1]) || !is_array($matches[1])) {
             $error = self::ERR_INPUT_CUSTOMERDATES;
@@ -81,7 +87,11 @@ class InputParser extends AppHotelRes implements InputParserInterface
         if ($this->content) {
             return $this->content;
         }
-        $this->content = $this->iw->getInput();
+        if (!$this->content = $this->iw->getInput()) {
+            $this->error = $this->iw->getError();
+            $this->errno = $this->iw->getErrno();
+            return false;
+        }
         return $this->content;
     }
 }

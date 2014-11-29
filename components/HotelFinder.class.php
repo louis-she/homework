@@ -1,21 +1,29 @@
 <?php
 
+
+
 interface HotelFinderInterface
 {
     /* Get customer type, reward or normal*/
-    public function run();
+    public function getCheapest();
 }
 
-class HotelFinder extends AppHotelRes implements InputParserInterface 
+class HotelFinder extends AppHotelRes implements HotelFinderInterface
 {
     /* The Hotel config, include rating, price etc */
     private $hotelConfig;
 
     /* type of the customer, Regular or Rewards */
-    private $costomerType;
+    private $customerType;
 
     /* dates of the user to stay */
-    private $costomerDates;
+    private $customerDates;
+
+    /* all the weekday str */
+    private $weekday;
+
+    /* all the weekend str */
+    private $weekend;
 
     const ERR_INPUT_CUSTOMERTYPE = 'Can\'t get custom type, fixed your input';
     const ERR_INPUT_CUSTOMERTYPE_NO = '200001';
@@ -30,12 +38,14 @@ class HotelFinder extends AppHotelRes implements InputParserInterface
      * @param   $customerType   string
      * @param   $customerDates  array
      */
-    public function __construct($hotelConfig, $customerType, $cunstomerDates)
+    public function __construct($hotelConfig, $customerType, $customerDates)
     {
         parent::__construct();
-        $this->hotelConfig   = $inputWrapper;
+        $this->hotelConfig   = $hotelConfig;
         $this->customerType  = $customerType;
         $this->customerDates = $customerDates;
+        $this->weekday = array('mon', 'tues', 'wed', 'thur', 'fri');
+        $this->weekend = array('sat', 'sun');
     }
 
     /**
@@ -45,40 +55,43 @@ class HotelFinder extends AppHotelRes implements InputParserInterface
      */
     public function getCheapest()
     {
-        $this->hotelConfig = array(
-            'Lakewood' => array(
-                'rating' => 3,
-                'Regular' => array(
-                    'weekday' => 110,
-                    'weekend' => 90,
-                ),
-                'Rewards' => array(
-                    'weekday' => 80,
-                    'weekend' => 80,
-                ),
-            ),
-            'Bridgewood' => array(
-                'rating' => 4,
-                'Regular' => array(
-                    'weekday' => 160,
-                    'weekend' => 60,
-                ),
-                'Rewards' => array(
-                    'weekday' => 110,
-                    'weekend' => 50,
-                )
-            ),
-            'Ridgewood' => array(
-                'rating' => 5,
-                'Regular' => array(
-                    'weekday' => 220,
-                    'weekend' => 150,
-                ),
-                'Rewards' => array(
-                    'weekday' => 100,
-                    'weekend' => 40,
-                ),
-            ),
-        );
+        $cheapestHotel = '';
+        $cheapestPrice = 0;
+        $hotelRating = 0;
+        foreach ($this->hotelConfig as $hotel => $hotelConf) {
+            $price = $this->computeOne($hotel);
+            if (($cheapestHotel === '' || $price < $cheapestPrice)
+            || ($price === $cheapestPrice && $hotelConf["rating"] > $hotelRating)) {
+                $cheapestHotel = $hotel;
+                $cheapestPrice = $price;
+                $cheapestRating = $hotelConf['rating'];
+            }
+        }
+
+        return $cheapestHotel;
+    }
+
+    private function computeOne($whichHotel)
+    {
+        $hotelConfig = $this->hotelConfig["$whichHotel"];
+        $price = $hotelConfig["{$this->customerType}"];
+        $weekdayNum = 0;
+        $weekendNum = 0;
+
+        foreach ($this->customerDates as $cd) {
+            $cd = strtolower($cd);
+            if (in_array($cd, $this->weekday)) {
+                $weekdayNum++;
+            } else if (in_array($cd, $this->weekday)) {
+                $weekendNum++;
+            } else {
+                continue;
+            }
+        }
+
+        $weekdayPrice = $weekdayNum * $price['weekday'];
+        $weekendPrice = $weekendNum * $price['weekend'];
+
+        return $weekdayPrice + $weekendPrice;
     }
 }
