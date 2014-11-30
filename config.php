@@ -15,5 +15,5 @@ $config['hotel']['Bridgewood']['Rewards']['weekend'] = 50;
 $config['hotel']['Ridgewood']['rating'] = 5;
 $config['hotel']['Ridgewood']['Regular']['weekday'] = 220;
 $config['hotel']['Ridgewood']['Regular']['weekend'] = 150;
-$config['hotel']['Ridgewood']['Rewards']['weekday'] = 110;
+$config['hotel']['Ridgewood']['Rewards']['weekday'] = 100;
 $config['hotel']['Ridgewood']['Rewards']['weekend'] = 40;

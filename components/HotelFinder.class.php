@@ -1,7 +1,5 @@
 <?php
 
-
-
 interface HotelFinderInterface
 {
     /* Get customer type, reward or normal*/
@@ -57,11 +55,11 @@ class HotelFinder extends AppHotelRes implements HotelFinderInterface
     {
         $cheapestHotel = '';
         $cheapestPrice = 0;
-        $hotelRating = 0;
+        $cheapestRating = 0;
         foreach ($this->hotelConfig as $hotel => $hotelConf) {
             $price = $this->computeOne($hotel);
             if (($cheapestHotel === '' || $price < $cheapestPrice)
-            || ($price === $cheapestPrice && $hotelConf["rating"] > $hotelRating)) {
+            || ($price === $cheapestPrice && $hotelConf["rating"] > $cheapestRating)) {
                 $cheapestHotel = $hotel;
                 $cheapestPrice = $price;
                 $cheapestRating = $hotelConf['rating'];
@@ -82,7 +80,7 @@ class HotelFinder extends AppHotelRes implements HotelFinderInterface
             $cd = strtolower($cd);
             if (in_array($cd, $this->weekday)) {
                 $weekdayNum++;
-            } else if (in_array($cd, $this->weekday)) {
+            } else if (in_array($cd, $this->weekend)) {
                 $weekendNum++;
             } else {
                 continue;
@@ -91,7 +89,7 @@ class HotelFinder extends AppHotelRes implements HotelFinderInterface
 
         $weekdayPrice = $weekdayNum * $price['weekday'];
         $weekendPrice = $weekendNum * $price['weekend'];
-
+        $totalPrice   = $weekdayPrice + $weekendPrice;
         return $weekdayPrice + $weekendPrice;
     }
 }

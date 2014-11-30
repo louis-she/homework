@@ -1,6 +1,8 @@
 <?php
 
 define('ROOT', dirname(__FILE__) . '/');
+ini_set('display_errors', true);
+error_reporting(E_ALL);
 
 require ROOT . 'components/AppHotelRes.class.php';
 require ROOT . 'components/InputWrapper.class.php';
@@ -33,7 +35,7 @@ if (!$customerDates = $parser->getCustomerDates()) {
 $finder = new HotelFinder($config['hotel'], $customerType, $customerDates);
 
 if (!$cheapestHotel = $finder->getCheapest()) {
-    echo $cheapestHotel;
+    echo $finder->getError();
     exit(1);
 }
 
